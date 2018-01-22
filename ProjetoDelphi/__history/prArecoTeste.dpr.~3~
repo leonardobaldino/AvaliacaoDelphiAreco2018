@@ -1,0 +1,15 @@
+program prArecoTeste;
+
+uses
+  System.StartUpCopy,
+  FMX.Forms,
+  unMain in 'unMain.pas' {frmMain},
+  classProduto in 'classProduto.pas';
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.CreateForm(TfrmMain, frmMain);
+  Application.Run;
+end.

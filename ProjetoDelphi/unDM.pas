@@ -1,0 +1,40 @@
+unit unDM;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def,
+  FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys, FireDAC.FMXUI.Wait, Data.DB, FireDAC.Comp.Client, FireDAC.Stan.Param, FireDAC.DatS,
+  FireDAC.DApt.Intf, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Phys.PGDef, FireDAC.Phys.PG, FireDAC.Comp.UI, FireDAC.Phys.FB, FireDAC.Phys.FBDef,
+  FireDAC.Phys.IBBase;
+
+type
+  TDM = class(TDataModule)
+    FDTransaction: TFDTransaction;
+    FDGUIxWaitCursor: TFDGUIxWaitCursor;
+    FDConnection: TFDConnection;
+    FDPhysFBDriverLink: TFDPhysFBDriverLink;
+    procedure DataModuleCreate(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  DM: TDM;
+
+implementation
+
+{%CLASSGROUP 'FMX.Controls.TControl'}
+
+uses unLib;
+
+{$R *.dfm}
+
+procedure TDM.DataModuleCreate(Sender: TObject);
+begin
+  TLib.ConectDB(FDConnection);
+end;
+
+end.

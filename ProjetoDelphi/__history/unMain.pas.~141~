@@ -1,0 +1,347 @@
+unit unMain;
+
+interface
+
+uses
+  System.SysUtils, System.Types, System.UITypes, System.Classes,
+  System.Variants,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Layouts,
+  FMX.ListView.Types, FMX.ListView.Appearances,
+  FMX.ListView.Adapters.Base, FMX.ListView, FMX.Edit, FMX.Controls.Presentation,
+  FMX.StdCtrls, FMX.ListBox, FireDAC.Stan.Intf, FireDAC.Stan.Option,
+  FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
+  FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, Data.DB,
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client, System.Rtti,
+  System.Bindings.Outputs,
+  FMX.Bind.Editors, Data.Bind.EngExt, FMX.Bind.DBEngExt, Data.Bind.Components,
+  Data.Bind.DBScope, MultiDetailAppearanceU, classProduto, FMX.Objects;
+
+type
+  TfrmMain = class(TForm)
+    LayoutPesquisa: TLayout;
+    LayoutCadastro: TLayout;
+    ListViewPesquisa: TListView;
+    LabelID: TLabel;
+    EditID: TEdit;
+    EditCodigoBarra: TEdit;
+    LabelCodigoBarra: TLabel;
+    EditDescricao: TEdit;
+    LabelDescricao: TLabel;
+    LabelUnidade: TLabel;
+    LayoutAcao: TLayout;
+    ButtonNovo: TButton;
+    ButtonAlterar: TButton;
+    ButtonExcluir: TButton;
+    ButtonSalvar: TButton;
+    ButtonCancelar: TButton;
+    ButtonSair: TButton;
+    ComboBoxUnidade: TComboBox;
+    EditPeso: TEdit;
+    LabelPeso: TLabel;
+    EditEstoqueMinimo: TEdit;
+    LabelEstoqueMinimo: TLabel;
+    EditEstoqueMaximo: TEdit;
+    LabelEstoqueMaximo: TLabel;
+    EditEstoqueAtual: TEdit;
+    LabelEstoqueAtual: TLabel;
+    FDQueryPesquisa: TFDQuery;
+    FDQueryPesquisaID: TIntegerField;
+    FDQueryPesquisaCODIGOBARRA: TStringField;
+    FDQueryPesquisaUNIDADE: TStringField;
+    FDQueryPesquisaPESO: TBCDField;
+    FDQueryPesquisaDESCRICAO: TStringField;
+    FDQueryPesquisaESTOQUEMINIMO: TBCDField;
+    FDQueryPesquisaESTOQUEMAXIMO: TBCDField;
+    FDQueryPesquisaESTOQUEATUAL: TBCDField;
+    BindSourceDB: TBindSourceDB;
+    BindingsList: TBindingsList;
+    LinkListControlToField1: TLinkListControlToField;
+    GroupBoxFoto: TGroupBox;
+    ImageFoto: TImage;
+    LayoutFoto: TLayout;
+    ButtonFotoAdicionar: TButton;
+    ButtonFotoRemover: TButton;
+    Button3: TButton;
+    OpenDialog: TOpenDialog;
+    procedure ButtonNovoClick(Sender: TObject);
+    procedure ButtonAlterarClick(Sender: TObject);
+    procedure ButtonSalvarClick(Sender: TObject);
+    procedure ButtonCancelarClick(Sender: TObject);
+    procedure ButtonExcluirClick(Sender: TObject);
+    procedure ButtonSairClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure EditCodigoBarraChange(Sender: TObject);
+    procedure ComboBoxUnidadeChange(Sender: TObject);
+    procedure EditPesoChange(Sender: TObject);
+    procedure EditDescricaoChange(Sender: TObject);
+    procedure EditEstoqueMinimoChange(Sender: TObject);
+    procedure EditEstoqueMaximoChange(Sender: TObject);
+    procedure EditEstoqueAtualChange(Sender: TObject);
+    procedure EditIDChange(Sender: TObject);
+    procedure EditPesoKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char;
+      Shift: TShiftState);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure EditPesoKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char;
+      Shift: TShiftState);
+    procedure SomenteNumero(Sender: TObject; var Key: Word; var KeyChar: Char;
+      Shift: TShiftState);
+    procedure ListViewPesquisaDblClick(Sender: TObject);
+    procedure EditEstoqueMinimoKeyUp(Sender: TObject; var Key: Word;
+      var KeyChar: Char; Shift: TShiftState);
+    procedure EditEstoqueMaximoKeyUp(Sender: TObject; var Key: Word;
+      var KeyChar: Char; Shift: TShiftState);
+    procedure EditEstoqueAtualKeyUp(Sender: TObject; var Key: Word;
+      var KeyChar: Char; Shift: TShiftState);
+    procedure ButtonFotoRemoverClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    GNovoProduto: Boolean;
+    GUsuarioID: Integer;
+    GProduto: TProduto;
+    GUsuarioNome: String;
+    procedure LayoutVisible(xPesquisa, xCadastro: Boolean);
+    procedure HabilitarButtons(xEnabled: Boolean);
+  end;
+
+var
+  frmMain: TfrmMain;
+
+implementation
+
+{$R *.fmx}
+
+uses unDM, unLib;
+
+procedure TfrmMain.ButtonAlterarClick(Sender: TObject);
+begin
+  LayoutVisible(False, True);
+  HabilitarButtons(True);
+
+  EditID.Text := IntToStr(FDQueryPesquisaID.AsInteger);
+  EditCodigoBarra.Text := FDQueryPesquisaCODIGOBARRA.AsString;
+  ComboBoxUnidade.ItemIndex := ComboBoxUnidade.Items.IndexOf
+    (FDQueryPesquisaUNIDADE.AsString);
+  EditPeso.Text := FormatFloat('#,###0.000', FDQueryPesquisaPESO.AsFloat);
+  EditDescricao.Text := FDQueryPesquisaDESCRICAO.AsString;
+  EditEstoqueMinimo.Text := FormatFloat('#,###0.000',
+    FDQueryPesquisaESTOQUEMINIMO.AsFloat);
+  EditEstoqueMaximo.Text := FormatFloat('#,###0.000',
+    FDQueryPesquisaESTOQUEMAXIMO.AsFloat);
+  EditEstoqueAtual.Text := FormatFloat('#,###0.000',
+    FDQueryPesquisaESTOQUEATUAL.AsFloat);
+  if EditCodigoBarra.CanFocus then
+    EditCodigoBarra.SetFocus;
+end;
+
+procedure TfrmMain.ButtonCancelarClick(Sender: TObject);
+begin
+  case MessageDlg('Deseja cancelar as alterações realizadas?',
+    TMsgDlgType.mtConfirmation, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo], 0) of
+    mrYes:
+      begin
+        if GNovoProduto then
+        begin
+          GProduto.ExcluirProduto(GProduto.ID);
+        end;
+        GNovoProduto := False;
+        LayoutVisible(True, False);
+        HabilitarButtons(False);
+      end;
+  end;
+end;
+
+procedure TfrmMain.ButtonExcluirClick(Sender: TObject);
+begin
+  case MessageDlg('Deseja excluir o produto?', TMsgDlgType.mtConfirmation,
+    [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo], 0) of
+    mrYes:
+      begin
+        if FDQueryPesquisa.RecordCount > 0 then
+        begin
+          GProduto.ExcluirProduto(FDQueryPesquisaID.AsInteger);
+          FDQueryPesquisa.Refresh;
+          HabilitarButtons(False);
+        end;
+      end;
+  end;
+end;
+
+procedure TfrmMain.ButtonFotoRemoverClick(Sender: TObject);
+begin
+  ImageFoto.Bitmap := nil;
+  GProduto.Foto := nil;
+end;
+
+procedure TfrmMain.ButtonNovoClick(Sender: TObject);
+begin
+  GNovoProduto := True;
+  LayoutVisible(False, True);
+  HabilitarButtons(True);
+
+  EditID.Text := '0';
+  EditCodigoBarra.Text := EmptyStr;
+  ComboBoxUnidade.ItemIndex := -1;
+  EditPeso.Text := '0,000';
+  EditDescricao.Text := EmptyStr;
+  EditEstoqueMinimo.Text := '0,000';
+  EditEstoqueMaximo.Text := '0,000';
+  EditEstoqueAtual.Text := '0,000';
+
+  EditID.Text := TLib.Select('SELECT * FROM PRODUTO_INSERT');
+
+  if EditCodigoBarra.CanFocus then
+    EditCodigoBarra.SetFocus;
+end;
+
+procedure TfrmMain.ButtonSairClick(Sender: TObject);
+begin
+  case MessageDlg('Deseja encerrar a aplicação?', TMsgDlgType.mtConfirmation,
+    [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo], 0) of
+    mrYes:
+      begin
+        if LayoutCadastro.Visible then
+        begin
+          ButtonCancelarClick(ButtonCancelar);
+        end;
+        Close;
+      end;
+  end;
+end;
+
+procedure TfrmMain.ButtonSalvarClick(Sender: TObject);
+begin
+  GNovoProduto := False;
+  GProduto.SalvarProduto;
+  FDQueryPesquisa.Refresh;
+  LayoutVisible(True, False);
+  HabilitarButtons(False);
+end;
+
+procedure TfrmMain.ComboBoxUnidadeChange(Sender: TObject);
+begin
+  if TComboBox(Sender).ItemIndex <> -1 then
+  begin
+    GProduto.Unidade := TComboBox(Sender).Items.Strings
+      [TComboBox(Sender).ItemIndex];
+  end;
+end;
+
+procedure TfrmMain.EditCodigoBarraChange(Sender: TObject);
+begin
+  GProduto.CodigoBarra := TEdit(Sender).Text;
+end;
+
+procedure TfrmMain.EditDescricaoChange(Sender: TObject);
+begin
+  GProduto.Descricao := TEdit(Sender).Text;
+end;
+
+procedure TfrmMain.EditEstoqueAtualChange(Sender: TObject);
+begin
+  GProduto.EstoqueAtual := StrToFloatDef(TEdit(Sender).Text, 0);
+end;
+
+procedure TfrmMain.EditEstoqueAtualKeyUp(Sender: TObject; var Key: Word;
+  var KeyChar: Char; Shift: TShiftState);
+begin
+  TLib.conversaoMonetaria(TEdit(Sender));
+end;
+
+procedure TfrmMain.EditEstoqueMaximoChange(Sender: TObject);
+begin
+  GProduto.EstoqueMaximo := StrToFloatDef(TEdit(Sender).Text, 0);
+end;
+
+procedure TfrmMain.EditEstoqueMaximoKeyUp(Sender: TObject; var Key: Word;
+  var KeyChar: Char; Shift: TShiftState);
+begin
+  TLib.conversaoMonetaria(TEdit(Sender));
+end;
+
+procedure TfrmMain.EditEstoqueMinimoChange(Sender: TObject);
+begin
+  GProduto.EstoqueMinimo := StrToFloatDef(TEdit(Sender).Text, 0);
+end;
+
+procedure TfrmMain.EditEstoqueMinimoKeyUp(Sender: TObject; var Key: Word;
+  var KeyChar: Char; Shift: TShiftState);
+begin
+  TLib.conversaoMonetaria(TEdit(Sender));
+end;
+
+procedure TfrmMain.EditIDChange(Sender: TObject);
+begin
+  GProduto.ID := StrToInt(EditID.Text);
+end;
+
+procedure TfrmMain.EditPesoChange(Sender: TObject);
+begin
+  GProduto.Peso := StrToFloatDef(TEdit(Sender).Text, 0);
+end;
+
+procedure TfrmMain.EditPesoKeyDown(Sender: TObject; var Key: Word;
+  var KeyChar: Char; Shift: TShiftState);
+begin
+  if not CharInSet(KeyChar, ['0' .. '9', '.', ',', #8, #9, #13]) then
+  begin
+    Beep;
+    KeyChar := #0;
+  end;
+end;
+
+procedure TfrmMain.EditPesoKeyUp(Sender: TObject; var Key: Word;
+  var KeyChar: Char; Shift: TShiftState);
+begin
+  TLib.conversaoMonetaria(TEdit(Sender));
+end;
+
+procedure TfrmMain.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  FreeAndNil(GProduto);
+end;
+
+procedure TfrmMain.FormCreate(Sender: TObject);
+begin
+  FDQueryPesquisa.Close;
+  FDQueryPesquisa.Open;
+  GNovoProduto := False;
+  ButtonSalvar.Enabled := False;
+  HabilitarButtons(False);
+  GProduto := TProduto.Create;
+  LayoutVisible(True, False);
+end;
+
+procedure TfrmMain.HabilitarButtons(xEnabled: Boolean);
+begin
+  ButtonNovo.Enabled := not xEnabled;
+  ButtonAlterar.Enabled := not xEnabled and (FDQueryPesquisa.RecordCount > 0);
+  ButtonExcluir.Enabled := not xEnabled and (FDQueryPesquisa.RecordCount > 0);
+
+  ButtonSalvar.Enabled := xEnabled;
+  ButtonCancelar.Enabled := xEnabled;
+end;
+
+procedure TfrmMain.LayoutVisible(xPesquisa, xCadastro: Boolean);
+begin
+  LayoutPesquisa.Visible := xPesquisa;
+  LayoutCadastro.Visible := xCadastro;
+end;
+
+procedure TfrmMain.ListViewPesquisaDblClick(Sender: TObject);
+begin
+  ButtonAlterarClick(ButtonAlterar);
+end;
+
+procedure TfrmMain.SomenteNumero(Sender: TObject; var Key: Word;
+  var KeyChar: Char; Shift: TShiftState);
+begin
+  if not CharInSet(KeyChar, ['0' .. '9', '.', ',', #8, #9, #13]) then
+  begin
+    Beep;
+    KeyChar := #0;
+  end;
+end;
+
+end.

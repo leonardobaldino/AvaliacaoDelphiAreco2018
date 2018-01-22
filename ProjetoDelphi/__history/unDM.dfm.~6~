@@ -1,0 +1,30 @@
+object DM: TDM
+  OldCreateOrder = False
+  Height = 311
+  Width = 409
+  object FDTransaction: TFDTransaction
+    Connection = FDConnection
+    Left = 144
+    Top = 167
+  end
+  object FDPhysPgDriverLink: TFDPhysPgDriverLink
+    Left = 143
+    Top = 72
+  end
+  object FDGUIxWaitCursor: TFDGUIxWaitCursor
+    Provider = 'FMX'
+    Left = 144
+    Top = 40
+  end
+  object FDConnection: TFDConnection
+    Params.Strings = (
+      'Server=localhost'
+      'Database=infamatsocial'
+      'User_Name=postgres'
+      'Password=Z?:3H3!G_4`n'
+      'DriverID=pG')
+    LoginPrompt = False
+    Left = 144
+    Top = 8
+  end
+end

@@ -1,0 +1,238 @@
+unit classProduto;
+
+interface
+
+uses
+  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
+  FireDAC.Stan.Error,
+  FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async,
+  FireDAC.DApt, Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client,
+  System.SysUtils, FMX.Objects, System.Classes, FMX.Graphics;
+
+type
+  TProduto = class
+  private
+    FEstoqueAtual: Double;
+    FPeso: Double;
+    FEstoqueMinimo: Double;
+    FDescricao: String;
+    FID: Integer;
+    FCodigoBarra: String;
+    FUnidade: String;
+    FEstoqueMaximo: Double;
+    FFoto: TImage;
+    procedure SetCodigoBarra(const Value: String);
+    procedure SetDescricao(const Value: String);
+    procedure SetEstoqueAtual(const Value: Double);
+    procedure SetEstoqueMaximo(const Value: Double);
+    procedure SetEstoqueMinimo(const Value: Double);
+    procedure SetID(const Value: Integer);
+    procedure SetPeso(const Value: Double);
+    procedure SetUnidade(const Value: String);
+    procedure limpar;
+    procedure SetFoto(const Value: TImage);
+  public
+    property ID: Integer read FID write SetID;
+    property CodigoBarra: String read FCodigoBarra write SetCodigoBarra;
+    property Unidade: String read FUnidade write SetUnidade;
+    property Peso: Double read FPeso write SetPeso;
+    property Descricao: String read FDescricao write SetDescricao;
+    property EstoqueMinimo: Double read FEstoqueMinimo write SetEstoqueMinimo;
+    property EstoqueMaximo: Double read FEstoqueMaximo write SetEstoqueMaximo;
+    property EstoqueAtual: Double read FEstoqueAtual write SetEstoqueAtual;
+    property Foto: TImage read FFoto write SetFoto;
+
+    constructor create;
+    destructor Destroy; override;
+    procedure SalvarProduto;
+    procedure ExcluirProduto(xID: Integer);
+    procedure CarregarFoto(xID: Integer);
+  end;
+
+implementation
+
+{ TProduto }
+
+uses unDM, unLib;
+
+procedure TProduto.CarregarFoto(xID: Integer);
+var
+  LQry: TFDQuery;
+  LFoto: TStream;
+  LImagem: TBitmap;
+begin
+  LQry := TFDQuery.create(nil);
+  LQry.Connection := DM.FDConnection;
+  try
+    LQry.SQL.Clear;
+    LQry.SQL.Add('SELECT foto FROM view_produto ' + 'WHERE id = ' + IntToStr(Self.ID));
+    LQry.Open;
+    if not LQry.IsEmpty then
+    begin
+      LFoto := LQry.CreateBlobStream(LQry.FieldByName('foto'), TBlobStreamMode.bmRead);
+//      LImagem := TBitmap.Create;
+//      try
+        Self.Foto.Bitmap.LoadFromStream(LFoto);
+//      finally
+//        FreeAndNil(LImagem);
+//      end;
+//      FreeAndNil(LFoto);
+
+    end
+    else
+      Self.Foto := nil;
+  finally
+    LQry.Close;
+    FreeAndNil(LQry);
+  end;
+end;
+
+constructor TProduto.create;
+begin
+  inherited create;
+end;
+
+destructor TProduto.Destroy;
+begin
+  inherited Destroy;
+end;
+
+procedure TProduto.ExcluirProduto(xID: Integer);
+begin
+  TLib.ExecutaSQL('EXECUTE PROCEDURE PRODUTO_DELETE(' + IntToStr(xID) + ')');
+end;
+
+procedure TProduto.limpar;
+begin
+
+end;
+
+procedure TProduto.SalvarProduto;
+var
+  LPeso, LEstoqueMinimo, LEstoqueMaximo, LEstoqueAtual: String;
+  LFoto: TMemoryStream;
+  LQryFoto: TFDQuery;
+begin
+  if Trim(Self.CodigoBarra) <> EmptyStr then
+  begin
+    TLib.ExecutaSQL('EXECUTE PROCEDURE PRODUTO_UPDATE(' +
+      QuotedStr('CODIGOBARRA') + ', 0, False, 0, ' + QuotedStr(Self.CodigoBarra)
+      + ', ' + IntToStr(Self.ID) + ', null)');
+  end;
+
+  if Trim(Self.Unidade) <> EmptyStr then
+  begin
+    TLib.ExecutaSQL('EXECUTE PROCEDURE PRODUTO_UPDATE(' + QuotedStr('UNIDADE') +
+      ', 0, False, 0, ' + QuotedStr(Self.Unidade) + ', ' + IntToStr(Self.ID) +
+      ', null)');
+  end;
+
+  LPeso := TLib.TrocarVirgula(Self.Peso);
+  TLib.ExecutaSQL('EXECUTE PROCEDURE PRODUTO_UPDATE(' + QuotedStr('PESO') +
+    ', 0, False, ' + LPeso + ', null, ' + IntToStr(Self.ID) + ', null)');
+
+  if Trim(Self.Descricao) <> EmptyStr then
+  begin
+    TLib.ExecutaSQL('EXECUTE PROCEDURE PRODUTO_UPDATE(' + QuotedStr('DESCRICAO')
+      + ', 0, False, 0, ' + QuotedStr(Self.Descricao) + ', ' + IntToStr(Self.ID)
+      + ', null)');
+  end;
+
+  LEstoqueMinimo := TLib.TrocarVirgula(Self.EstoqueMinimo);
+  TLib.ExecutaSQL('EXECUTE PROCEDURE PRODUTO_UPDATE(' +
+    QuotedStr('ESTOQUEMINIMO') + ', 0, False, ' + LEstoqueMinimo + ', null, ' +
+    IntToStr(Self.ID) + ', null)');
+
+  LEstoqueMaximo := TLib.TrocarVirgula(Self.EstoqueMaximo);
+  TLib.ExecutaSQL('EXECUTE PROCEDURE PRODUTO_UPDATE(' +
+    QuotedStr('ESTOQUEMAXIMO') + ', 0, False, ' + LEstoqueMinimo + ', null, ' +
+    IntToStr(Self.ID) + ', null)');
+
+  LEstoqueAtual := TLib.TrocarVirgula(Self.EstoqueAtual);
+  TLib.ExecutaSQL('EXECUTE PROCEDURE PRODUTO_UPDATE(' +
+    QuotedStr('ESTOQUEATUAL') + ', 0, False, ' + LEstoqueMinimo + ', null, ' +
+    IntToStr(Self.ID) + ', null)');
+
+  LQryFoto := TFDQuery.create(nil);
+  LQryFoto.Connection := DM.FDConnection;
+  // LQryFoto.Close;
+  try
+    // try
+    if Self.Foto.Bitmap <> nil then
+    begin
+      LQryFoto.SQL.Clear;
+      LQryFoto.SQL.Add('EXECUTE PROCEDURE PRODUTO_UPDATE(' + QuotedStr('FOTO') +
+        ', 0, False, 0, null, ' + IntToStr(Self.ID) + ', :foto)');
+      LQryFoto.Params.CreateParam(ftBlob, 'foto', ptUnknown);
+      LFoto := TMemoryStream.create;
+      try
+        Self.Foto.Bitmap.SaveToStream(LFoto);
+        LQryFoto.ParamByName('foto').LoadFromStream(LFoto, ftBlob);
+        LQryFoto.ExecSQL;
+      except
+        on Exception do
+      end;
+      FreeAndNil(LFoto);
+    end;
+    // except
+    // dm.GravarLog(LQryFoto.SQL.Text,e.Message,Self.Name,'gravarImagem');
+    // end;
+  finally
+    LQryFoto.Close;
+    FreeAndNil(LQryFoto);
+  end;
+end;
+
+procedure TProduto.SetCodigoBarra(const Value: String);
+begin
+  if Self <> nil then
+    FCodigoBarra := Value;
+end;
+
+procedure TProduto.SetDescricao(const Value: String);
+begin
+  if Self <> nil then
+    FDescricao := Value;
+end;
+
+procedure TProduto.SetEstoqueAtual(const Value: Double);
+begin
+  if Self <> nil then
+    FEstoqueAtual := Value;
+end;
+
+procedure TProduto.SetEstoqueMaximo(const Value: Double);
+begin
+  if Self <> nil then
+    FEstoqueMaximo := Value;
+end;
+
+procedure TProduto.SetEstoqueMinimo(const Value: Double);
+begin
+  if Self <> nil then
+    FEstoqueMinimo := Value;
+end;
+
+procedure TProduto.SetFoto(const Value: TImage);
+begin
+  FFoto := Value;
+end;
+
+procedure TProduto.SetID(const Value: Integer);
+begin
+  FID := Value;
+end;
+
+procedure TProduto.SetPeso(const Value: Double);
+begin
+  if Self <> nil then
+    FPeso := Value;
+end;
+
+procedure TProduto.SetUnidade(const Value: String);
+begin
+  if Self <> nil then
+    FUnidade := Value;
+end;
+
+end.

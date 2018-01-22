@@ -1,0 +1,329 @@
+object frmMain: TfrmMain
+  Left = 0
+  Top = 0
+  Caption = 'Cadastro de Produto'
+  ClientHeight = 467
+  ClientWidth = 577
+  Position = ScreenCenter
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  OnClose = FormClose
+  DesignerMasterStyle = 0
+  object LayoutPesquisa: TLayout
+    Align = Client
+    Size.Width = 540.000000000000000000
+    Size.Height = 440.000000000000000000
+    Size.PlatformDefault = False
+    Visible = False
+    TabOrder = 0
+    object ListViewPesquisa: TListView
+      ItemAppearanceClassName = 'TMultiDetailItemAppearance'
+      ItemEditAppearanceClassName = 'TMultiDetailDeleteAppearance'
+      HeaderAppearanceClassName = 'TListHeaderObjects'
+      FooterAppearanceClassName = 'TListHeaderObjects'
+      Align = Client
+      Size.Width = 540.000000000000000000
+      Size.Height = 440.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      OnDblClick = ListViewPesquisaDblClick
+      SearchVisible = True
+    end
+  end
+  object LayoutCadastro: TLayout
+    Align = Client
+    Size.Width = 577.000000000000000000
+    Size.Height = 427.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    object ComboBoxUnidade: TComboBox
+      Items.Strings = (
+        'PC'
+        'UN'
+        'KG'
+        'LT')
+      Position.X = 352.000000000000000000
+      Position.Y = 32.000000000000000000
+      Size.Width = 81.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 2
+      OnChange = ComboBoxUnidadeChange
+      object LabelUnidade: TLabel
+        Position.Y = -19.000000000000000000
+        Size.Width = 81.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Unidade'
+        TabOrder = 0
+      end
+    end
+    object EditID: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      TabOrder = 0
+      ReadOnly = True
+      Position.X = 24.000000000000000000
+      Position.Y = 32.000000000000000000
+      Size.Width = 65.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      OnChange = EditIDChange
+      object LabelID: TLabel
+        Position.Y = -19.000000000000000000
+        Size.Width = 65.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'ID'
+        TabOrder = 0
+      end
+    end
+    object EditCodigoBarra: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      TabOrder = 1
+      Position.X = 104.000000000000000000
+      Position.Y = 32.000000000000000000
+      Size.Width = 233.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      OnChange = EditCodigoBarraChange
+      object LabelCodigoBarra: TLabel
+        Position.Y = -19.000000000000000000
+        Size.Width = 233.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Codigo de Barra'
+        TabOrder = 0
+      end
+    end
+    object EditDescricao: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      TabOrder = 4
+      Position.X = 24.000000000000000000
+      Position.Y = 80.000000000000000000
+      Size.Width = 521.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      OnChange = EditDescricaoChange
+      object LabelDescricao: TLabel
+        Position.Y = -19.000000000000000000
+        Size.Width = 100.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Descri'#231#227'o'
+        TabOrder = 0
+      end
+    end
+    object EditPeso: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      TabOrder = 3
+      Position.X = 448.000000000000000000
+      Position.Y = 32.000000000000000000
+      Size.Width = 97.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      OnChange = EditPesoChange
+      OnKeyDown = SomenteNumero
+      OnKeyUp = EditPesoKeyUp
+      object LabelPeso: TLabel
+        Position.Y = -19.000000000000000000
+        Size.Width = 65.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Peso'
+        TabOrder = 0
+      end
+    end
+    object EditEstoqueMinimo: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      TabOrder = 5
+      Position.X = 24.000000000000000000
+      Position.Y = 128.000000000000000000
+      Size.Width = 129.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      OnChange = EditEstoqueMinimoChange
+      OnKeyDown = SomenteNumero
+      OnKeyUp = EditEstoqueMinimoKeyUp
+      object LabelEstoqueMinimo: TLabel
+        Position.Y = -19.000000000000000000
+        Size.Width = 129.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Estoque M'#237'nimo'
+        TabOrder = 0
+      end
+    end
+    object EditEstoqueMaximo: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      TabOrder = 6
+      Position.X = 168.000000000000000000
+      Position.Y = 128.000000000000000000
+      Size.Width = 129.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      OnChange = EditEstoqueMaximoChange
+      OnKeyDown = SomenteNumero
+      OnKeyUp = EditEstoqueMaximoKeyUp
+      object LabelEstoqueMaximo: TLabel
+        Position.Y = -19.000000000000000000
+        Size.Width = 129.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Estoque Maximo'
+        TabOrder = 0
+      end
+    end
+    object EditEstoqueAtual: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      TabOrder = 7
+      Position.X = 312.000000000000000000
+      Position.Y = 128.000000000000000000
+      Size.Width = 129.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      OnChange = EditEstoqueAtualChange
+      OnKeyDown = SomenteNumero
+      OnKeyUp = EditEstoqueAtualKeyUp
+      object LabelEstoqueAtual: TLabel
+        Position.Y = -19.000000000000000000
+        Size.Width = 129.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Estoque Atual'
+        TabOrder = 0
+      end
+    end
+  end
+  object LayoutAcao: TLayout
+    Align = Bottom
+    Position.Y = 427.000000000000000000
+    Size.Width = 577.000000000000000000
+    Size.Height = 40.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 2
+    object ButtonNovo: TButton
+      Position.X = 8.000000000000000000
+      Position.Y = 8.000000000000000000
+      TabOrder = 0
+      Text = '&Novo'
+      OnClick = ButtonNovoClick
+    end
+    object ButtonAlterar: TButton
+      Position.X = 104.000000000000000000
+      Position.Y = 8.000000000000000000
+      TabOrder = 1
+      Text = '&Alterar'
+      OnClick = ButtonAlterarClick
+    end
+    object ButtonExcluir: TButton
+      Position.X = 200.000000000000000000
+      Position.Y = 8.000000000000000000
+      TabOrder = 2
+      Text = '&Excluir'
+      OnClick = ButtonExcluirClick
+    end
+    object ButtonSalvar: TButton
+      Position.X = 296.000000000000000000
+      Position.Y = 8.000000000000000000
+      TabOrder = 3
+      Text = '&Salvar'
+      OnClick = ButtonSalvarClick
+    end
+    object ButtonCancelar: TButton
+      Position.X = 392.000000000000000000
+      Position.Y = 8.000000000000000000
+      TabOrder = 4
+      Text = '&Cancelar'
+      OnClick = ButtonCancelarClick
+    end
+    object ButtonSair: TButton
+      Position.X = 488.000000000000000000
+      Position.Y = 8.000000000000000000
+      TabOrder = 5
+      Text = 'Sa&ir'
+      OnClick = ButtonSairClick
+    end
+  end
+  object FDQueryPesquisa: TFDQuery
+    Connection = DM.FDConnection
+    SQL.Strings = (
+      'select * from view_produto')
+    Left = 104
+    Top = 224
+    object FDQueryPesquisaID: TIntegerField
+      FieldName = 'ID'
+      Origin = 'ID'
+    end
+    object FDQueryPesquisaCODIGOBARRA: TStringField
+      FieldName = 'CODIGOBARRA'
+      Origin = 'CODIGOBARRA'
+      Size = 30
+    end
+    object FDQueryPesquisaUNIDADE: TStringField
+      FieldName = 'UNIDADE'
+      Origin = 'UNIDADE'
+      FixedChar = True
+      Size = 2
+    end
+    object FDQueryPesquisaPESO: TBCDField
+      FieldName = 'PESO'
+      Origin = 'PESO'
+      Precision = 18
+      Size = 3
+    end
+    object FDQueryPesquisaDESCRICAO: TStringField
+      FieldName = 'DESCRICAO'
+      Origin = 'DESCRICAO'
+      Size = 300
+    end
+    object FDQueryPesquisaESTOQUEMINIMO: TBCDField
+      FieldName = 'ESTOQUEMINIMO'
+      Origin = 'ESTOQUEMINIMO'
+      Precision = 18
+      Size = 3
+    end
+    object FDQueryPesquisaESTOQUEMAXIMO: TBCDField
+      FieldName = 'ESTOQUEMAXIMO'
+      Origin = 'ESTOQUEMAXIMO'
+      Precision = 18
+      Size = 3
+    end
+    object FDQueryPesquisaESTOQUEATUAL: TBCDField
+      FieldName = 'ESTOQUEATUAL'
+      Origin = 'ESTOQUEATUAL'
+      Precision = 18
+      Size = 3
+    end
+  end
+  object BindSourceDB: TBindSourceDB
+    DataSet = FDQueryPesquisa
+    ScopeMappings = <>
+    Left = 32
+    Top = 224
+  end
+  object BindingsList: TBindingsList
+    Methods = <>
+    OutputConverters = <>
+    Left = 68
+    Top = 221
+    object LinkListControlToField1: TLinkListControlToField
+      Category = 'Quick Bindings'
+      DataSource = BindSourceDB
+      FieldName = 'DESCRICAO'
+      Control = ListViewPesquisa
+      FillExpressions = <
+        item
+          SourceMemberName = 'CODIGOBARRA'
+          ControlMemberName = 'Detail1'
+        end>
+      FillHeaderExpressions = <>
+      FillBreakGroups = <>
+    end
+  end
+  object OpenDialog: TOpenDialog
+    Left = 136
+    Top = 224
+  end
+end

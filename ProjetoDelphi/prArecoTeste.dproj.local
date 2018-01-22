@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2018/01/19 14:26:06.000.574,=C:\Users\andur\OneDrive\Documentos\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2018/01/19 14:26:51.000.363,I:\Ancient Codes\Delphi\My Projects\SGP - Delphi 10.2\Areco - Teste\unMain.fmx=C:\Users\andur\OneDrive\Documentos\Embarcadero\Studio\Projects\Unit1.fmx</Transaction>
+    <Transaction>2018/01/19 14:26:51.000.363,I:\Ancient Codes\Delphi\My Projects\SGP - Delphi 10.2\Areco - Teste\unMain.pas=C:\Users\andur\OneDrive\Documentos\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2018/01/19 14:27:05.000.620,I:\Ancient Codes\Delphi\My Projects\SGP - Delphi 10.2\Areco - Teste\prArecoTeste.dproj=C:\Users\andur\OneDrive\Documentos\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>2018/01/20 11:36:58.000.207,=I:\Ancient Codes\Delphi\My Projects\SGP - Delphi 10.2\Areco - Teste\Unit1.pas</Transaction>
+    <Transaction>2018/01/20 11:37:12.000.010,I:\Ancient Codes\Delphi\My Projects\SGP - Delphi 10.2\Areco - Teste\classProduto.pas=I:\Ancient Codes\Delphi\My Projects\SGP - Delphi 10.2\Areco - Teste\Unit1.pas</Transaction>
+    <Transaction>2018/01/20 11:49:37.000.074,=I:\Ancient Codes\Delphi\My Projects\SGP - Delphi 10.2\Areco - Teste\Unit1.pas</Transaction>
+    <Transaction>2018/01/20 11:49:47.000.269,I:\Ancient Codes\Delphi\My Projects\SGP - Delphi 10.2\Areco - Teste\unDM.dfm=I:\Ancient Codes\Delphi\My Projects\SGP - Delphi 10.2\Areco - Teste\Unit1.dfm</Transaction>
+    <Transaction>2018/01/20 11:49:47.000.269,I:\Ancient Codes\Delphi\My Projects\SGP - Delphi 10.2\Areco - Teste\unDM.pas=I:\Ancient Codes\Delphi\My Projects\SGP - Delphi 10.2\Areco - Teste\Unit1.pas</Transaction>
+    <Transaction>2018/01/20 11:55:54.000.485,=I:\Ancient Codes\Delphi\My Projects\SGP - Delphi 10.2\Areco - Teste\Unit1.pas</Transaction>
+    <Transaction>2018/01/20 12:13:57.000.613,=I:\Ancient Codes\Delphi\My Projects\SGP - Delphi 10.2\Areco - Teste\unLib.pas</Transaction>
+    <Transaction>2018/01/20 12:40:53.000.632,=I:\Ancient Codes\Delphi\My Projects\SGP - Delphi 10.2\Areco - Teste\unConfigurarServidor.pas</Transaction>
+  </Transactions>
+	<ActiveMobileDevice>
+		<NoProfile iOSSimulator="iPhone5" Android="V4H6RWRGAQLFS4YH"/>
+	</ActiveMobileDevice>
+</BorlandProject>

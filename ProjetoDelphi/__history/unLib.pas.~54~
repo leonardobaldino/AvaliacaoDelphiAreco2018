@@ -1,0 +1,237 @@
+unit unLib;
+
+interface
+
+uses
+  System.Classes, FMX.Forms, System.SysUtils, FMX.Dialogs,
+  FMX.TabControl, Data.DB, FireDAC.Stan.Intf, FireDAC.Stan.Option,
+  FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def,
+  FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys, FireDAC.FMXUI.Wait,
+  FireDAC.Comp.UI, FireDAC.Comp.Client, FireDAC.Phys.SQLite,
+  FireDAC.Stan.ExprFuncs,
+  FMX.Controls, FMX.StdCtrls, FMX.Layouts, FMX.Types, FMX.Objects, FMX.ListBox,
+  System.Types, System.UITypes, FMX.Graphics, FMX.Colors, FMX.Pickers, inifiles,
+{$IFDEF MSWINDOWS}
+  Winapi.Windows, System.Rtti,
+{$ENDIF MSWINDOWS}
+{$IFDEF POSIX}
+  Posix.Dlfcn, Posix.Fcntl, Posix.SysStat, Posix.SysTime, Posix.SysTypes,
+{$ENDIF POSIX}
+{$IF defined(POSIX) and not defined(IOS) and not defined(ANDROID)}
+  System.Internal.Unwinder,
+{$ENDIF POSIX and !IOS}
+{$IFDEF MACOS}
+  Macapi.Mach, Macapi.CoreServices, Macapi.CoreFoundation,
+{$ENDIF MACOS}
+  System.SysConst, FMX.ExtCtrls, FMX.ComboEdit, FMX.Edit, FMX.DateTimeCtrls,
+  FMX.Memo,
+  ShellAPI;
+
+type
+  TParameters = record
+    FieldName: String;
+    Value: String;
+  end;
+
+  // Impressão de Prontuarios
+type
+  TLib = class
+  private
+  public
+    class function ConectDB(var SQLConn: TFDConnection): Boolean;
+    class function Select(xSelect: string; xOwner: TFmxObject)
+      : TFDQuery; overload;
+    class function Select(xSelect: string): Variant; overload;
+    class function AutoInc(campo, tabela: string): Integer;
+    class function ExecutaSQL(sql: String): Integer;
+    // class function FileExists(const FileName: string; FollowLink: Boolean = True): Boolean;
+    class function Configuracao(xGrupo, xConfig: String): String;
+    class procedure conversaoMonetaria(x: TEdit);
+    class function Conversao(xConversao: String): Extended; overload;
+    class function TrocarVirgula(xFloat: Double): String;
+  end;
+
+implementation
+
+uses unMain, Soap.EncdDecd, StrUtils, unConfigurarServidor, unDM;
+
+{ TLib }
+
+class function TLib.TrocarVirgula(xFloat: Double): String;
+begin
+  Result := FloatToStr(xFloat);
+  Result := StringReplace(Result, '.', EmptyStr, [rfReplaceAll]);
+  Result := StringReplace(Result, ',', '.', [rfReplaceAll]);
+end;
+
+class function TLib.AutoInc(campo, tabela: string): Integer;
+var
+  qryAutoInc: TFDQuery;
+begin
+  qryAutoInc := TFDQuery.Create(nil);
+  // qryAutoInc.Connection := frmMain.FDConn;
+  qryAutoInc.Close;
+  with qryAutoInc.sql do
+  begin
+    Clear;
+    Add('Select Max(' + campo + ')+1 as Cod From ' + tabela);
+  end;
+  qryAutoInc.Open;
+  try
+    Result := qryAutoInc.FieldByName('Cod').AsInteger
+  except
+    Result := 0;
+  end;
+end;
+
+class function TLib.ConectDB(var SQLConn: TFDConnection): Boolean;
+begin
+  Result := False;
+  try
+    SQLConn.Connected := False;
+    DM.FDPhysFBDriverLink.VendorLib := 'fbclient.dll';
+    SQLConn.Params.Clear;
+    SQLConn.Params.Values['Server'] := Configuracao('Configuracoes', 'DBIP');
+    SQLConn.Params.Values['Database'] := Configuracao('Configuracoes',
+      'DBNAME');
+    SQLConn.Params.Values['User_Name'] := 'sysdba';
+    SQLConn.Params.Values['Password'] := '5173370';
+    // SQLConn.Params.Values['VendorLib'] := ExtractFileDir(ParamStr(0)) + '\libpq.dll';
+    SQLConn.Params.Values['DriverID'] := 'FB';
+    SQLConn.Connected := True;
+    Result := True;
+  except
+    on e: Exception do
+    begin
+      Result := False;
+      ShowMessage('Falha na conexão.' + #13 + 'Entrar em contato com o suporte.'
+        + #13 + e.Message);
+      Application.Terminate;
+    end;
+  end;
+end;
+
+class function TLib.Configuracao(xGrupo, xConfig: String): String;
+var
+  LConfigFile: TIniFile;
+  LStr, LPath: String;
+begin
+  LPath := ExtractFilePath(ParamStr(0)) + 'sys\config.system';
+  LConfigFile := TIniFile.Create(LPath);
+  try
+    LStr := LConfigFile.ReadString(xGrupo, xConfig, EmptyStr);
+    Result := LStr;
+  finally
+    FreeAndNil(LConfigFile);
+  end;
+end;
+
+class function TLib.Conversao(xConversao: String): Extended;
+var
+  x: Integer;
+  Conversao1: String;
+begin
+  if Trim(xConversao) = '' then
+    xConversao := '0';
+  Conversao1 := '';
+  for x := 1 to Length(xConversao) do
+    if (Copy(xConversao, x, 1) >= '0') and (Copy(xConversao, x, 1) <= '9') and
+      (Copy(xConversao, x, 1) <> '.') or (Copy(xConversao, x, 1) = ',') or
+      (Copy(xConversao, x, 1) = '-') then
+      Conversao1 := Conversao1 + Copy(xConversao, x, 1);
+  Conversao := StrToFloat(Conversao1);
+end;
+
+class procedure TLib.conversaoMonetaria(x: TEdit);
+var
+  cont, cont2: Integer;
+begin
+  cont2 := Length(x.Text);
+  x.Text := StringReplace(x.Text, ',', EmptyStr, [rfReplaceAll]);
+  x.Text := StringReplace(x.Text, '.', EmptyStr, [rfReplaceAll]);
+  cont := Length(x.Text);
+  if cont <= 2 then
+  begin
+    if cont = 2 then
+    begin
+      x.Text := FormatFloat('#,###,##0.00', Conversao('0,' + x.Text));
+      cont2 := cont2 + 5;
+    end;
+    if cont = 1 then
+    begin
+      x.Text := FormatFloat('#,###,###0.000', Conversao('0,00' + x.Text));
+      cont2 := cont2 + 5;
+    end;
+  end
+  else
+  begin
+    x.Text := FormatFloat('#,###,###0.000',
+      Conversao(Copy(x.Text, 1, cont - 3) + ',' + Copy(x.Text, cont - 2, 3)));
+  end;
+  x.SelStart := cont2 + 5;
+end;
+
+class function TLib.ExecutaSQL(sql: String): Integer;
+var
+  Qry: TFDQuery;
+begin
+  Qry := TFDQuery.Create(nil);
+  try
+    Qry.Connection := DM.FDConnection;
+    Qry.Close;
+    Qry.sql.Clear;
+    Qry.sql.Add(sql);
+    Qry.ExecSQL;
+    Result := Qry.RowsAffected;
+  finally
+    FreeAndNil(Qry);
+  end;
+end;
+
+class procedure TLib.RemoverFoto(xImagem: TImage);
+begin
+  xImagem.Bitmap.LoadFromFile(ExtractFileDir(ParamStr(0)) +
+    '\imagens\Image-icon128x128.png');
+end;
+
+class function TLib.Select(xSelect: string): Variant;
+var
+  LQry: TFDQuery;
+begin
+  Result := EmptyStr;
+  LQry := TFDQuery.Create(nil);
+  try
+    LQry.Connection := DM.FDConnection;
+    LQry.Close;
+    LQry.sql.Clear;
+    LQry.sql.Text := xSelect;
+    LQry.Open;
+    if not LQry.IsEmpty then
+    begin
+      Result := LQry.Fields[0].AsString;
+    end;
+  finally
+    FreeAndNil(LQry);
+  end;
+end;
+
+class function TLib.Select(xSelect: string; xOwner: TFmxObject): TFDQuery;
+begin
+  try
+    Result := TFDQuery.Create(nil);
+    Result.Connection := DM.FDConnection;
+    Result.Transaction := DM.FDTransaction;
+    Result.sql.Clear;
+    Result.sql.Add(xSelect);
+    Result.Open;
+  except
+    on e: Exception do
+    begin
+      MessageDlg('Entrar em contato com o suporte.' + #13 + e.Message,
+        TMsgDlgType.mtError, [TMsgDlgBtn.mbOK], 0);
+      Result := nil;
+    end;
+  end;
+end;
+
+end.
